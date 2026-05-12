@@ -1,0 +1,31 @@
+name: Create torrent
+on:
+  push:
+    branches:
+      - master
+      
+env:
+  name: "StarRail_4.2.53"
+  comment: "PPSR beta"
+  url: "https://gfs208n220.userstorage.mega.co.nz/dl/LXRu-5wbnQJoigfL3BxSfkb6w5zBru5YKQKJvS_xqdjIGiUNu-ZZTsZ3woQ5wVPOxhI30gft9GMNhnDwHumgKxJLt-U54Vp_BSO_AVCJTpzq_sVBM3-9plrXv1qpRYrfYQ2Q2vmjYik0S1qeXw3NlH9WTgYmqLLZrgg7fGVCOKOUPwef01H1R02c7bVgWxVOAmaXbsRtJstfllTwOYIYDVTMPEn6a3y3YcUOoZG2IWJWqeGr9UMM4OCX4lXnI3cpC6al8dh9bF8nlm_u939Bguo6qooFkQ/StarRail_4.2.53.zip"
+  file_name: "StarRail_4.2.53.zip"
+  piece_size: 24 # Check the README.md for recommended piece size
+      
+jobs:
+  create:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install mktorrent
+        run: sudo apt-get install mktorrent
+        
+      - name: Download file
+        run: wget -nv -O "$file_name" "$url"
+        
+      - name: Create torrent using mktorrent
+        run: mktorrent -c "$comment" -l $piece_size -o "${name}.torrent" -w "$url" "$file_name"
+        
+      - name: Upload torrent file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.name }}
+          path: ${{ env.name }}.torrent
